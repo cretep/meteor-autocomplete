@@ -58,6 +58,7 @@ class @AutoComplete
   constructor: (settings) ->
     @limit = settings.limit || 5
     @position = settings.position || "bottom"
+    @followCaret = settings.followCaret ? true
 
     @rules = settings.rules
     validateRule(rule) for rule in @rules
@@ -290,7 +291,7 @@ class @AutoComplete
     offset = getCaretCoordinates(@element, @element.selectionStart)
 
     pos = {
-      left: position.left + offset.left
+      left: position.left + if @followCaret then offset.left else 0
     }
 
     # Position menu from top (above) or from bottom of caret (below, default)
