@@ -58,7 +58,7 @@ class @AutoComplete
   constructor: (settings) ->
     @limit = settings.limit || 5
     @position = settings.position || "bottom"
-
+    @wholeField = settings.wholeField||false
     @rules = settings.rules
     validateRule(rule) for rule in @rules
 
@@ -289,15 +289,18 @@ class @AutoComplete
     position = @$element.position()
     offset = getCaretCoordinates(@element, @element.selectionStart)
 
-    pos = {
-      left: position.left + offset.left
-    }
-
-    # Position menu from top (above) or from bottom of caret (below, default)
-    if @position is "top"
-      pos.bottom = @$element.offsetParent().height() - position.top - offset.top
+    pos = {}
+    if @wholeField
+      pos.left = position.left
+      pos.top = position.top + @$element.outerHeight()
+      pos.width = @$element.outerWidth()
     else
-      pos.top = position.top + offset.top + parseInt(@$element.css('font-size'))
+      # Position menu from top (above) or from bottom of caret (below, default)
+      pos.left = position.left + if @followCaret then offset.left else 0
+      if @position is "top"
+        pos.bottom = @$element.offsetParent().height() - position.top - offset.top
+      else
+        pos.top = position.top + offset.top + parseInt(@$element.css('font-size'))
 
     @tmplInst.$(".-autocomplete-container").css(pos)
 
